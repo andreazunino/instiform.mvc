@@ -1,10 +1,10 @@
 <?php
 
-require_once('Estudiante.php');
-require_once('Curso.php');
-require_once('gestionEstudiante.php');
-require_once('../Modelo/gestionCurso.php');
-require_once('../Vista/menuVista.php');
+require_once('Modelo/estudiante.php');
+require_once('Modelo/curso.php');
+require_once('Modelo/gestionEstudiante.php');
+require_once('Modelo/gestionCurso.php');
+require_once('Vista/menuVista.php');
 
 class Controlador {
     private $gestionEstudiante;
@@ -204,6 +204,8 @@ class Controlador {
         }
     }
 
+}  
+
 // Crear instancias del modelo y la vista
     $gestionEstudiante = new gestionEstudiante();
     $gestionCurso = new gestionCurso();
@@ -215,7 +217,7 @@ class Controlador {
 // Ejecutar la aplicación
     $controlador->run();
 
-}
+
     
 
 
