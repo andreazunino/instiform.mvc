@@ -4,7 +4,7 @@ require_once('Modelo/estudiante.php');
 require_once('Modelo/curso.php');
 require_once('Modelo/gestionEstudiante.php');
 require_once('Modelo/gestionCurso.php');
-require_once('Vista/menuVista.php');
+require_once('./Vista/menuVista.php');
 
 class Controlador {
     private $gestionEstudiante;
@@ -17,14 +17,22 @@ class Controlador {
         $this->vista = $vista;
     }
 
+
     public function run() {
+      // $this->vista->mostrarMenuPrincipal();
         // Lógica de tu aplicación
-        $opcionMenu = readline("Ingrese una opción: ");
+        // $opcionMenu = readline("Ingrese una opción: ");
         // Procesar la opción del menú usando el modelo
+        // $this->menu($opcionMenu);
+        $opcionMenu = 1;
         $this->menu($opcionMenu);
+
     }
 
     public function menu($opcionMenu) {
+        while (true){
+            $this->vista->mostrarMenuPrincipal();
+            $opcionMenu = readline("Selecciona una opción: ");
         switch ($opcionMenu) {
             case '1':
                 $this->subMenuUsuarios();
@@ -35,11 +43,12 @@ class Controlador {
             case '0':
                 // Lógica para la opción 0 (Salir)...
                 // Puedes mostrar un mensaje de despedida con la vista y luego salir del programa.
-                break;
+                exit;
             default:
                 // Opción no válida. Mostrar un mensaje de error con la vista.
                 $this->vista->mostrarMensajeError("Opción no válida. Por favor, selecciona una opción válida.");
         }
+    }
     }
 
 
@@ -100,6 +109,7 @@ class Controlador {
         case '0':
             echo "Seleccionaste Volver al Menu Principal\n";
             $this->menu($opcionUser);
+            self::run();
         }
     }
 
@@ -211,14 +221,14 @@ class Controlador {
     $gestionCurso = new gestionCurso();
     $vista = new Vista();
 
+
 // Crear instancia del controlador
     $controlador = new Controlador($gestionEstudiante, $gestionCurso, $vista);
 
 // Ejecutar la aplicación
-    $controlador->run();
 
+$controlador->run();
 
-    
 
 
 
