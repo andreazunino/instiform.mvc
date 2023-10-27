@@ -54,7 +54,7 @@ class Controlador {
 
 
     function subMenuUsuarios() {
-        echo "\n";
+        /*echo "\n";
         echo "========== Menu Usuario =========\n";
         echo "1. Dar de Alta Usuario\n";
         echo "2. Dar de Baja Usuario\n";
@@ -62,13 +62,13 @@ class Controlador {
         echo "4. Ver Datos e Inscripciones\n";
         echo "0. Volver al Menu Principal\n";
         echo "=========== Instiform ==========\n";
-        echo "\n";
+        echo "\n";*/
     
          $opcionUser = readline("Selecciona una opción: ");
 
         switch ($opcionUser){
          case '1':
-            echo "Seleccionaste Dar de Alta Usuario\n";
+            echo "Seleccionaste Dar de Alta Estudiante\n";
             $nombre = readline("Ingrese nombre del Estudiante");
             $apellido = readline("Ingrese apellido del Estudiante");
             $dni = readline("Ingrese dni del Estudiante");
@@ -78,7 +78,7 @@ class Controlador {
             break;
 
         case '2':
-            echo "Seleccionaste Dar de Baja Usuario\n";
+            echo "Seleccionaste Dar de Baja Estudiante\n";
                 echo "Ingrese el DNI del estudiante a eliminar: ";
                 $dni = readline();
                 $estudianteEliminado = $this->gestionEstudiante->eliminarEstudiantePorDNI($dni);
@@ -89,7 +89,7 @@ class Controlador {
                 }
             break;
         case '3':
-            echo "Seleccionaste Modificar Datos de Usuario\n";
+            echo "Seleccionaste Modificar Datos de Estudiante\n";
             $dniModificar = readline("Ingrese el DNI del estudiante a modificar: ");
             $estudianteEncontrado = $this->gestionEstudiante->buscarEstudiantePorDNI($dniModificar);
             if ($estudianteEncontrado) {
@@ -114,7 +114,7 @@ class Controlador {
     }
 
     function subMenuCursos() {
-        echo "\n";
+        /*echo "\n";
         echo "========== Menu Cursos =========\n";
         echo "1. Dar de Alta Curso\n";
         echo "2. Dar de Baja Curso\n";
@@ -122,7 +122,7 @@ class Controlador {
         echo "4. Listar Cursos\n";
         echo "0. Volver al Menu Principal\n";
         echo "=========== Instiform ==========\n";
-        echo "\n";
+        echo "\n";*/
 
         $opcionCursos = readline("Selecciona una opción: \n");
         switch ($opcionCursos){
