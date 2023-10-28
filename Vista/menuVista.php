@@ -1,4 +1,5 @@
 <?php
+
 /*class MenuView {
     public function mostrarMenu() {
         // Lógica para mostrar el menú
@@ -125,6 +126,7 @@ class Vista {
         echo "=========== Instiform ===========\n";
         echo "\n";
     }
+    
 }
 
 

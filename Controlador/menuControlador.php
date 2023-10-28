@@ -227,7 +227,7 @@ class Controlador {
 
 // Ejecutar la aplicación
 
-$controlador->run();
+
 
 
 

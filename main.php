@@ -6,6 +6,14 @@ require_once('Modelo/gestionEstudiante.php');
 require_once('Modelo/gestionCurso.php');
 require_once('Vista/menuVista.php');
 require_once('Controlador/menuControlador.php');
+require_once('Modelo/conexionNueva.php');
+
+$db = Conexion::getConexion();
+if ($db != null) {
+    echo "Conexion Establecida";
+    echo PHP_EOL;
+}
+
 
 // Crear instancias del modelo
 $gestionEstudiante = new GestionEstudiante();
@@ -19,5 +27,5 @@ $menu = new Controlador($gestionEstudiante, $gestionCurso, $vista);
 
 // Ejecutar la aplicación
 //Controlador::run()
-$menu->run();
+ $menu->run();
 

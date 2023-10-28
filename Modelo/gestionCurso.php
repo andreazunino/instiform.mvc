@@ -62,4 +62,3 @@ class gestionCurso {
         return $this->cursos;
     }
 }
-?>

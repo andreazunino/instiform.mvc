@@ -1,5 +1,5 @@
 <?php
-require_once('curso.php');
+
 class Curso {
     private $nombre;
     private $id;
