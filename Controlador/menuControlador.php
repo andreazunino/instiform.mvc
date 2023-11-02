@@ -19,11 +19,6 @@ class Controlador {
 
 
     public function run() {
-      // $this->vista->mostrarMenuPrincipal();
-        // Lógica de tu aplicación
-        // $opcionMenu = readline("Ingrese una opción: ");
-        // Procesar la opción del menú usando el modelo
-        // $this->menu($opcionMenu);
         $opcionMenu = 1;
         $this->menu($opcionMenu);
 
@@ -35,9 +30,11 @@ class Controlador {
             $opcionMenu = readline("Selecciona una opción: ");
         switch ($opcionMenu) {
             case '1':
+                $this->vista->mostrarSubMenuUsuarios();
                 $this->subMenuUsuarios();
                 break;
             case '2':
+                $this->vista->mostrarSubMenuCursos();
                 $this->subMenuCursos();
                 break;
             case '0':
@@ -54,15 +51,6 @@ class Controlador {
 
 
     function subMenuUsuarios() {
-        /*echo "\n";
-        echo "========== Menu Usuario =========\n";
-        echo "1. Dar de Alta Usuario\n";
-        echo "2. Dar de Baja Usuario\n";
-        echo "3. Modificar Datos de Usuario\n";
-        echo "4. Ver Datos e Inscripciones\n";
-        echo "0. Volver al Menu Principal\n";
-        echo "=========== Instiform ==========\n";
-        echo "\n";*/
     
          $opcionUser = readline("Selecciona una opción: ");
 
@@ -114,16 +102,6 @@ class Controlador {
     }
 
     function subMenuCursos() {
-        /*echo "\n";
-        echo "========== Menu Cursos =========\n";
-        echo "1. Dar de Alta Curso\n";
-        echo "2. Dar de Baja Curso\n";
-        echo "3. Modificar Datos de Curso\n";
-        echo "4. Listar Cursos\n";
-        echo "0. Volver al Menu Principal\n";
-        echo "=========== Instiform ==========\n";
-        echo "\n";*/
-
         $opcionCursos = readline("Selecciona una opción: \n");
         switch ($opcionCursos){
             case '1':
@@ -216,41 +194,8 @@ class Controlador {
 
 }  
 
-// Crear instancias del modelo y la vista
     $gestionEstudiante = new gestionEstudiante();
     $gestionCurso = new gestionCurso();
     $vista = new Vista();
 
-
-// Crear instancia del controlador
     $controlador = new Controlador($gestionEstudiante, $gestionCurso, $vista);
-
-// Ejecutar la aplicación
-
-
-
-
-
-
-/*
-class MenuControlador {
-    private $gestionEstudiante;
-    private $gestionCurso;
-
-    public function __construct($gestionEstudiante, $gestionCurso) {
-        $this->gestionEstudiante = $gestionEstudiante;
-        $this->gestionCurso = $gestionCurso;
-    }
-
-    public function run() {
-        while (true) {
-            $this->mainMenu();
-        }
-    }
-
-    public function mainMenu() {
-        // ... lógica para mostrar el menú principal y manejar la opción del usuario ...
-    }
-
-    // ... otros métodos para manejar diferentes opciones del usuario ...
-}*/
