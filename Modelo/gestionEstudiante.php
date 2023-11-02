@@ -8,7 +8,7 @@ class gestionEstudiante {
 
     public function agregarEstudiante($estudiante) {
         $this->estudiantes[] = $estudiante;
-        $this->guardarEnJSON();
+        $this->guardarEstudiantes();
     } 
 
     private function cargarDesdeJSON() {
@@ -63,7 +63,7 @@ class gestionEstudiante {
 
         if ($indice !== -1) {
             array_splice($this->estudiantes, $indice, 1);
-            $this->guardarEnJSON();
+            $this->guardarEstudiantes();
             return true;
         }
 
@@ -114,4 +114,28 @@ class gestionEstudiante {
             echo "No se encontró ningún estudiante con el DNI $dni.\n";
         }
     }
+
+    public function guardarEstudiantes() {
+        $conexion = Conexion::getConexion();
+
+        // Borra todos los registros existentes en la tabla para evitar duplicados al guardar
+        $conexion->query("DELETE FROM estudiante");
+
+        $query = $conexion->prepare("INSERT INTO estudiante (nombre, apellido, dni, email) VALUES (:nombre, :apellido, :dni, :email)");
+
+
+        foreach ($this->estudiantes as $estudiante) {
+            $nombre = $estudiante->getNombre();
+            $apellido = $estudiante->getApellido();
+            $dni = $estudiante->getDNI();
+            $email = $estudiante->getEmail();
+
+            $query->bindParam(':nombre', $nombre);
+            $query->bindParam(':apellido', $apellido);
+            $query->bindParam(':dni', $dni);
+            $query->bindParam(':email', $email);
+            $query->execute();
+}
+
+}
 }
