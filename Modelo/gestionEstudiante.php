@@ -1,9 +1,10 @@
 <?php
+require_once('Modelo/conexionNueva.php');
 class gestionEstudiante {
     private $estudiantes = [];
 
     public function __construct() {
-        $this->cargarDesdeJSON();
+        $this->cargarEstudiantesDesdePostgres();
     }
 
     public function agregarEstudiante($estudiante) {
@@ -11,45 +12,28 @@ class gestionEstudiante {
         $this->guardarEstudiantes();
     } 
 
-    private function cargarDesdeJSON() {
-        if (file_exists('data.json')) {
-            $jsonData = file_get_contents('data.json');
-            $data = json_decode($jsonData, true);
-
-            if ($data && isset($data['estudiantes'])) {
-                foreach ($data['estudiantes'] as $estudianteData) {
-                    $this->estudiantes[] = $this->arrayToEstudiante($estudianteData);
-                }
-            }
+    public function cargarEstudiantesDesdePostgres() {
+        $conexion = Conexion::getConexion();
+        $statement = $conexion->query("SELECT * FROM estudiante");
+    
+        while ($estudianteData = $statement->fetch(PDO::FETCH_ASSOC)) {
+            var_dump($estudianteData); // Verifica la estructura de $estudianteData
+            $estudiante = $this->arrayToEstudiante($estudianteData);
+            $this->estudiantes[] = $estudiante;
         }
     }
 
     private function arrayToEstudiante($estudianteData) {
         return new Estudiante(
-            $estudianteData['nombre'],
-            $estudianteData['apellido'],
-            $estudianteData['dni'],
-            $estudianteData['email']
+            $estudianteData->nombre,
+            $estudianteData->apellido,
+            $estudianteData->dni,
+            $estudianteData->email
         );
     }
+    
+    
 
-    private function guardarEnJSON() {
-        $data = [
-            'estudiantes' => array_map([$this, 'estudianteToArray'], $this->estudiantes),
-        ];
-
-        $jsonData = json_encode($data, JSON_PRETTY_PRINT);
-        file_put_contents('data.json', $jsonData);
-    }
-
-    private function estudianteToArray($estudiante) {
-        return [
-            'nombre' => $estudiante->getNombre(),
-            'apellido' => $estudiante->getApellido(),
-            'dni' => $estudiante->getDNI(),
-            'email' => $estudiante->getEmail(),
-        ];
-    }
 
 
     public function eliminarEstudiantePorDNI($dni) {
