@@ -96,7 +96,8 @@ class Vista {
     public function mostrarMenuPrincipal() {
         $opcionesMenuPrincipal = [
             "Configuración de Estudiantes",
-            "Configuración de Cursos"
+            "Configuración de Cursos",
+            "Inscribir"
         ];
         $this->mostrarMenu($opcionesMenuPrincipal);
     }

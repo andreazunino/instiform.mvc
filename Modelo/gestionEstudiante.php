@@ -4,90 +4,103 @@ class gestionEstudiante {
     private $estudiantes = [];
 
     public function __construct() {
-        $this->cargarEstudiantesDesdePostgres();
+        $this->cargarEstudiantesDesdePostgrees();
     }
 
     public function agregarEstudiante($estudiante) {
+        $estudianteExistente = $this->buscarEstudiantePorDNI($estudiante->getDNI());
+        
+        if ($estudianteExistente) {
+            echo "El estudiante con el DNI {$estudiante->getDNI()} ya existe en la base de datos.";
+            return;
+        }
         $this->estudiantes[] = $estudiante;
+
         $this->guardarEstudiantes();
-    } 
+ 
+    }
+    
 
-    public function cargarEstudiantesDesdePostgres() {
+    
+    public function buscarEstudiantePorDNI($dni) {
         $conexion = Conexion::getConexion();
-        $statement = $conexion->query("SELECT * FROM estudiante");
+        $query = $conexion->prepare("SELECT * FROM estudiante WHERE dni = :dni");
+        $query->bindParam(':dni', $dni);
+        $query->execute();
     
-        while ($estudianteData = $statement->fetch(PDO::FETCH_ASSOC)) {
-            var_dump($estudianteData); // Verifica la estructura de $estudianteData
-            $estudiante = $this->arrayToEstudiante($estudianteData);
-            $this->estudiantes[] = $estudiante;
+        $estudiante = $query->fetch(PDO::FETCH_ASSOC);
+    
+        if ($estudiante) {
+            return new Estudiante(
+                $estudiante['nombre'],
+                $estudiante['apellido'],
+                $estudiante['dni'],
+                $estudiante['email']
+            );
+        } else {
+            return null;
         }
     }
-
-    private function arrayToEstudiante($estudianteData) {
-        return new Estudiante(
-            $estudianteData->nombre,
-            $estudianteData->apellido,
-            $estudianteData->dni,
-            $estudianteData->email
-        );
-    }
-    
     
 
-
-
-    public function eliminarEstudiantePorDNI($dni) {
-        $indice = -1;
-        foreach ($this->estudiantes as $key => $estudiante) {
-            if ($estudiante->getDNI() === $dni) {
-                $indice = $key;
-                break;
+    public function cargarEstudiantesDesdePostgrees(){
+        $sql = "SELECT * FROM estudiante";
+        $estudiantes = Conexion::query($sql);
+        
+        foreach ($estudiantes as $estudiante) {
+            if (is_object($estudiante)) {
+                $nuevoEstudiante = new Estudiante(
+                    $estudiante->nombre,
+                    $estudiante->apellido,
+                    $estudiante->dni,
+                    $estudiante->email
+                );
+                $this->estudiantes[] = $nuevoEstudiante;
+            } else {
+                echo "Los datos del estudiante no están en el formato esperado.";
             }
-        }
-
-        if ($indice !== -1) {
-            array_splice($this->estudiantes, $indice, 1);
-            $this->guardarEstudiantes();
+                }
+    }
+    
+    
+    public function eliminarEstudiantePorDNI($dni) {
+        $conexion = Conexion::getConexion();
+        $query = $conexion->prepare("DELETE FROM estudiante WHERE dni = :dni");
+        $query->bindParam(':dni', $dni);
+        $resultado = $query->execute();
+    
+        if ($resultado && $query->rowCount() > 0) {
+            $this->cargarEstudiantesDesdePostgrees();
             return true;
         }
+    
+        return false;
 
+    }
+    
+    
+    
+    public function modificarEstudiantePorDNI($dni, $nuevoNombre, $nuevoApellido, $nuevoEmail) {
+        $conexion = Conexion::getConexion();
+        $query = $conexion->prepare("UPDATE estudiante SET nombre = :nuevoNombre, apellido = :nuevoApellido, email = :nuevoEmail WHERE dni = :dni");
+        $query->bindParam(':nuevoNombre', $nuevoNombre);
+        $query->bindParam(':nuevoApellido', $nuevoApellido);
+        $query->bindParam(':nuevoEmail', $nuevoEmail);
+        $query->bindParam(':dni', $dni);
+        $resultado = $query->execute();
+    
+        if ($resultado && $query->rowCount() > 0) {
+            $this->cargarEstudiantesDesdePostgrees();
+            return true;
+        }
+    
         return false;
     }
     
-    public function modificarEstudiantePorDNI($dni, $nuevoNombre, $nuevoApellido, $nuevoEmail) {
-        foreach ($this->estudiantes as $estudiante) {
-            if ($estudiante->getDNI() === $dni) {
-                $estudiante->setNombre($nuevoNombre);
-                $estudiante->setApellido($nuevoApellido);
-                $estudiante->setEmail($nuevoEmail);
-                $this->guardarEnJSON();
-                return true;
-            }
-        }
-
-        return false;
-    }
-
-    public function buscarEstudiantePorDNI($dni) {
-        foreach ($this->estudiantes as $estudiante) {
-            if ($estudiante->getDNI() === $dni) {
-                return $estudiante;
-            }
-        }
-
-        return null;
-    }
 
     public function verDatosEInscripcionesPorDNI($dni) {
-        $estudianteEncontrado = null;
-
-        foreach ($this->estudiantes as $estudiante) {
-            if ($estudiante->getDNI() === $dni) {
-                $estudianteEncontrado = $estudiante;
-                break;
-            }
-        }
-
+        $estudianteEncontrado = $this->buscarEstudiantePorDNI($dni);
+    
         if ($estudianteEncontrado !== null) {
             echo "Datos del estudiante:\n";
             echo "Nombre: " . $estudianteEncontrado->getNombre() . "\n";
@@ -98,28 +111,29 @@ class gestionEstudiante {
             echo "No se encontró ningún estudiante con el DNI $dni.\n";
         }
     }
+    
 
     public function guardarEstudiantes() {
         $conexion = Conexion::getConexion();
-
-        // Borra todos los registros existentes en la tabla para evitar duplicados al guardar
-        $conexion->query("DELETE FROM estudiante");
-
-        $query = $conexion->prepare("INSERT INTO estudiante (nombre, apellido, dni, email) VALUES (:nombre, :apellido, :dni, :email)");
-
-
+    
+        $query = $conexion->prepare("INSERT INTO estudiante (nombre, apellido, dni, email) VALUES (:nombre, :apellido, :dni, :email) 
+            ON CONFLICT (dni) DO UPDATE SET 
+            nombre = EXCLUDED.nombre,
+            apellido = EXCLUDED.apellido,
+            email = EXCLUDED.email");
+    
         foreach ($this->estudiantes as $estudiante) {
             $nombre = $estudiante->getNombre();
             $apellido = $estudiante->getApellido();
             $dni = $estudiante->getDNI();
             $email = $estudiante->getEmail();
-
+    
             $query->bindParam(':nombre', $nombre);
             $query->bindParam(':apellido', $apellido);
             $query->bindParam(':dni', $dni);
             $query->bindParam(':email', $email);
             $query->execute();
-}
-
-}
+        }
+        echo "Estudiante agregado correctamente.\n";
+    }    
 }

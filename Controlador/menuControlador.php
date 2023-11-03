@@ -5,16 +5,19 @@ require_once('Modelo/curso.php');
 require_once('Modelo/gestionEstudiante.php');
 require_once('Modelo/gestionCurso.php');
 require_once('./Vista/menuVista.php');
+require_once('./Modelo/inscripcion.php');
 
 class Controlador {
     private $gestionEstudiante;
     private $gestionCurso;
     private $vista;
+    private $inscripcion; 
 
     public function __construct($gestionEstudiante, $gestionCurso, $vista) {
         $this->gestionEstudiante = $gestionEstudiante;
         $this->gestionCurso = $gestionCurso;
         $this->vista = $vista;
+        $this->inscripcion = new inscripcion;
     }
 
 
@@ -37,12 +40,12 @@ class Controlador {
                 $this->vista->mostrarSubMenuCursos();
                 $this->subMenuCursos();
                 break;
-            case '0':
-                // Lógica para la opción 0 (Salir)...
-                // Puedes mostrar un mensaje de despedida con la vista y luego salir del programa.
+            case '3':
+                echo "Seleccionaste Inscribir Estudiante en Curso\n";
+                $this->inscripcion->inscribirEstudianteEnCurso();
+                break;
                 exit;
             default:
-                // Opción no válida. Mostrar un mensaje de error con la vista.
                 $this->vista->mostrarMensajeError("Opción no válida. Por favor, selecciona una opción válida.");
         }
     }
@@ -67,14 +70,14 @@ class Controlador {
 
         case '2':
             echo "Seleccionaste Dar de Baja Estudiante\n";
-                echo "Ingrese el DNI del estudiante a eliminar: ";
-                $dni = readline();
-                $estudianteEliminado = $this->gestionEstudiante->eliminarEstudiantePorDNI($dni);
-                if ($estudianteEliminado) {
-                    echo "Estudiante con DNI $dni ha sido eliminado correctamente.\n";
-                } else {
-                    echo "No se encontró ningún estudiante con el DNI $dni.\n";
-                }
+            echo "Ingrese el DNI del estudiante a eliminar: ";
+            $dni = readline();
+            $estudianteEliminado = $this->gestionEstudiante->eliminarEstudiantePorDNI($dni);
+            if ($estudianteEliminado) {
+                echo "Estudiante con DNI $dni ha sido eliminado correctamente.\n";
+            } else {
+                echo "No se encontró ningún estudiante con el DNI $dni o ocurrió un error al eliminar el estudiante.\n";
+            }
             break;
         case '3':
             echo "Seleccionaste Modificar Datos de Estudiante\n";
@@ -109,11 +112,14 @@ class Controlador {
                 $nombreCurso = readline("Ingrese el nombre del curso: ");
                 $codigoCurso = readline("Ingrese el código del curso: ");
 
+                while (!is_numeric($codigoCurso)) {
+                    echo "El código del curso debe ser un número. Inténtelo de nuevo.\n";
+                    $codigoCurso = readline("Ingrese el código del curso: ");
+                }
                 $curso = new Curso($nombreCurso, $codigoCurso);
 
                 $this->gestionCurso->agregarCurso($curso);
 
-                 echo "El curso ha sido dado de alta exitosamente.\n";
             break;
 
              case '2':
@@ -197,5 +203,4 @@ class Controlador {
     $gestionEstudiante = new gestionEstudiante();
     $gestionCurso = new gestionCurso();
     $vista = new Vista();
-
     $controlador = new Controlador($gestionEstudiante, $gestionCurso, $vista);

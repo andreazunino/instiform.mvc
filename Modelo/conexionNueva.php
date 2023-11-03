@@ -37,10 +37,12 @@
         / Retorna la conexión ya establecida a la DB, si no existe la establece
         */
         static function getConexion(){
-            if (isset (self::$db))
+            if (isset(self::$db)) {
                 return self::$db;
-            else
-                return new self();
+            } else {
+                new self();
+                return self::$db;
+            }
         }
         
         /**
@@ -48,11 +50,16 @@
          */
         static function query($sql) {
             $pDO = self::getConexion();
-            $statement = $pDO->query($sql, PDO::FETCH_OBJ);
-            $resultado = $statement->fetchAll();
-            return $resultado;
+            $statement = $pDO->query($sql);
+            if ($statement) {
+                $resultado = $statement->fetchAll(PDO::FETCH_OBJ);
+                return $resultado;
+            } else {
+                return [];
+            }
         }
-
+            
+        
         /**
          * Recibe un sql de ejecutcion
          */
