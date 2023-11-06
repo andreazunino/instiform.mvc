@@ -5,16 +5,19 @@ require_once('Modelo/curso.php');
 require_once('Modelo/gestionEstudiante.php');
 require_once('Modelo/gestionCurso.php');
 require_once('./Vista/menuVista.php');
+require_once('Modelo/inscripcion.php');
 
 class Controlador {
     private $gestionEstudiante;
     private $gestionCurso;
     private $vista;
+    private $inscripcion;
 
-    public function __construct($gestionEstudiante, $gestionCurso, $vista) {
+    public function __construct($gestionEstudiante, $gestionCurso, $vista, $inscripcion) {
         $this->gestionEstudiante = $gestionEstudiante;
         $this->gestionCurso = $gestionCurso;
         $this->vista = $vista;
+        $this->inscripcion = $inscripcion;
     }
 
 
@@ -39,7 +42,16 @@ class Controlador {
                 break;
             case '3':
                 echo "Seleccionaste Inscribir Estudiante en Curso\n";
+                $this->inscripcion->cargarInscripciones();
                 break;
+            case '4':
+                echo "Seleccionaste Borrar Inscripciones\n";
+                $this->inscripcion->listarInscripciones();
+                $idElim = readline("Ingrese el ID de la inscripcion a eliminar: ");
+                $this->inscripcion->eliminarInscripcionPorID($idElim);
+                break;
+            case '0':
+                echo "Que tengas Buen Dia";
                 exit;
             default:
                 $this->vista->mostrarMensajeError("Opción no válida. Por favor, selecciona una opción válida.");
@@ -90,8 +102,10 @@ class Controlador {
             }
             break;
         case '4':
+            $this->gestionEstudiante->listarEstudiantes();
             $dniVer = readline("Ingrese el DNI del estudiante: ");
             $this->gestionEstudiante->verDatosEInscripcionesPorDNI($dniVer);
+            $this->inscripcion->mostrarInscripcionesPorDNI($dniVer);
             break;
         case '0':
             echo "Seleccionaste Volver al Menu Principal\n";
@@ -112,7 +126,7 @@ class Controlador {
                     echo "El código del curso debe ser un número. Inténtelo de nuevo.\n";
                     $codigoCurso = readline("Ingrese el código del curso: ");
                 }
-                $curso = new Curso($nombreCurso, $codigoCurso);
+                $curso = new Curso( $codigoCurso, $nombreCurso);
 
                 $this->gestionCurso->agregarCurso($curso);
 
@@ -121,7 +135,6 @@ class Controlador {
              case '2':
                 echo "Seleccionaste Dar de Baja Cursos\n";
                 echo "1. Buscar por Nombre\n";
-                echo "2. Buscar por Código\n";
                 echo "0. Volver al Menú de Cursos\n";
     
                 $opcionBuscar = readline("Selecciona una opción: \n");
@@ -142,22 +155,7 @@ class Controlador {
                         }
                         break;
             
-                    case '2':
-                        $codigoBuscar = readline("Ingrese el código del curso a buscar: ");
-                        $cursosEncontrados = $this->gestionCurso->buscarCursosPorCodigo($codigoBuscar);
-                        $this->gestionCurso->mostrarCursosEncontrados($cursosEncontrados);
-            
-                        if (!empty($cursosEncontrados)) {
-                            $idEliminar = readline("Ingrese el ID del curso a eliminar: ");
-                            $cursoEliminado = $this->gestionCurso->eliminarCursoPorID($idEliminar);
-                            if ($cursoEliminado) {
-                                echo "Curso con ID $idEliminar eliminado correctamente.\n";
-                            } else {
-                                echo "No se encontró ningún curso con el ID $idEliminar.\n";
-                            }
-                        }
-                        break;
-                    case '0':
+                        case '0':
                         $this->subMenuCursos();
                         break;
                     }
@@ -167,9 +165,8 @@ class Controlador {
                 $idModificar = readline("Ingrese el ID del curso a modificar: ");
                 $cursoEncontrado = $this->gestionCurso->buscarCursosPorCodigo($idModificar);
                 if ($cursoEncontrado) {
-                    $idNuevo = readline("Ingrese el nuevo id del curso: ");
                     $nombreNuevo = readline("Ingrese el nuevo nombre del curso: ");
-                    $this->gestionCurso->modificarCursoPorId($idModificar, $idNuevo, $nombreNuevo);
+                    $this->gestionCurso->modificarCursoPorId($idModificar, $nombreNuevo);
                     echo "Los datos del curso id $idModificar han sido modificados correctamente.\n";
                 } else {
                     echo "No se encontró ningún curso con el id $idModificar.\n";
@@ -196,7 +193,9 @@ class Controlador {
 
 }  
 
-    $gestionEstudiante = new gestionEstudiante();
-    $gestionCurso = new gestionCurso();
-    $vista = new Vista();
-    $controlador = new Controlador($gestionEstudiante, $gestionCurso, $vista);
+$gestionEstudiante = new gestionEstudiante();
+$gestionCurso = new gestionCurso();
+$vista = new Vista();
+$inscripcion = new Inscripcion();
+
+$controlador = new Controlador($gestionEstudiante, $gestionCurso, $vista, $inscripcion);

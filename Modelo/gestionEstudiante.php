@@ -1,6 +1,7 @@
 <?php
+require_once('Modelo/estudiante.php');
 require_once('Modelo/conexionNueva.php');
-class gestionEstudiante {
+class gestionEstudiante extends estudiante {
     private $estudiantes = [];
 
     public function __construct() {
@@ -135,5 +136,23 @@ class gestionEstudiante {
             $query->execute();
         }
         echo "Estudiante agregado correctamente.\n";
-    }    
+    }
+
+    public function obtenerEstudiantesParaInscripcion() {
+        $estudiantesParaInscripcion = [];
+        foreach ($this->estudiantes as $estudiante) {
+            $estudiantesParaInscripcion[] = $estudiante;
+        }
+        return $estudiantesParaInscripcion;
+    }
+    public function listarEstudiantes() {
+        if (empty($this->estudiantes)) {
+            echo "No hay estudiantes disponibles.\n";
+        } else {
+            echo "Lista de estudiantes:\n";
+            foreach ($this->estudiantes as $estudiante) {
+                echo "Nombre: " . $estudiante->getNombre() . ", Apellido: " . $estudiante->getApellido() . ", DNI: " . $estudiante->getDNI() . "\n";
+            }
+        }
+    }
 }

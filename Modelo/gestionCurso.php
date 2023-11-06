@@ -1,9 +1,44 @@
 <?php
-class gestionCurso {
+require_once('Modelo/inscripcion.php');
+class gestionCurso extends curso {
     private $cursos = [];
 
+    public function eliminarCursoConInscripciones($id) {
+        $conexion = Conexion::getConexion();
+    
+        try {
+            // Eliminar las inscripciones asociadas al curso
+            $sqlInscripciones = "DELETE FROM inscripcion WHERE id_curso = '$id'";
+            Conexion::ejecutar($sqlInscripciones);
+    
+            // Eliminar el curso
+            $sqlCurso = "DELETE FROM curso WHERE id = '$id'";
+            Conexion::ejecutar($sqlCurso);
+    
+            // Eliminar el curso de la lista de cursos
+            foreach ($this->cursos as $key => $curso) {
+                if ((int)$curso->getId() === (int)$id) {
+                    unset($this->cursos[$key]);
+                    $this->guardarCursos();
+                    return true;
+                }
+            }
+            return false;
+        } catch (PDOException $e) {
+            echo 'Error al eliminar curso: ' . $e->getMessage();
+        }
+    }
+    
     public function __construct() {
         $this->cargarCursosDesdePostgres();
+    }
+
+    public function obtenerIdCurso($curso) {
+        return $curso->getId();
+    }
+
+    public function obtenerNombreCurso($curso) {
+        return $curso->getNombre();
     }
 
     public function agregarCurso($curso) {
@@ -53,27 +88,40 @@ class gestionCurso {
         echo "Nombre: " . $curso->getNombre() . "\n";
         echo "===============================\n";
     }
-    
-    public function eliminarCursoPorID($id) {
-        foreach ($this->cursos as $key => $curso) {
-            if ($curso->getId() === $id) {
-                unset($this->cursos[$key]);
-                $this->guardarCursos();
-                return true;
-            }
-        }
-        return false;
-    }
 
-    public function modificarCursoPorId($id, $nuevoId, $nuevoNombre) {
+    public function eliminarCursoPorID($id) {
+        $conexion = Conexion::getConexion();
+        try {
+            $inscripcion = new Inscripcion(); // Crear una instancia de la clase Inscripcion si no se ha hecho anteriormente
+            $inscripcion->eliminarInscripcionPorCurso($id); // Eliminar inscripciones relacionadas con el curso
+    
+            $sql = "DELETE FROM curso WHERE id = '$id'";
+            Conexion::ejecutar($sql);
+    
+            foreach ($this->cursos as $key => $curso) {
+                if ((int)$curso->getId() === (int)$id) {
+                    unset($this->cursos[$key]);
+                    $this->guardarCursos();
+                    return true;
+                }
+            }
+            return false;
+        } catch (PDOException $e) {
+            echo 'Error al eliminar curso: ' . $e->getMessage();
+        }
+    }
+    
+    
+
+    public function modificarCursoPorId($id, $nuevoNombre) {
         foreach ($this->cursos as $curso) {
             if ($curso->getId() === $id) {
-                $curso->setId($nuevoId);
                 $curso->setNombre($nuevoNombre);
                 $this->guardarCursos();
                 return true;
             }
         }
+        $this->guardarCursos();
     }
 
     public function obtenerCursos() {
@@ -84,26 +132,42 @@ class gestionCurso {
         $conexion = Conexion::getConexion();
         $query = $conexion->query("SELECT * FROM curso");
         $resultados = $query->fetchAll(PDO::FETCH_ASSOC);
-
+    
+        // Vaciar el arreglo de cursos antes de cargar los cursos nuevamente
+        $this->cursos = [];
+    
         foreach ($resultados as $cursoData) {
             $curso = new Curso($cursoData['id'], $cursoData['nombre']);
             $this->cursos[] = $curso;
         }
     }
+    
 
-    private function guardarCursos() {
+    public function guardarCursos() {
+        $cursos = $this->cursos;
         $conexion = Conexion::getConexion();
-        $conexion->query("DELETE FROM curso");
-
-        $query = $conexion->prepare("INSERT INTO curso (id, nombre) VALUES (:id, :nombre)");
-
-        foreach ($this->cursos as $curso) {
+    
+        // Eliminar todos los cursos de la base de datos
+        $sql = "DELETE FROM curso";
+        Conexion::ejecutar($sql);
+    
+        // Volver a insertar todos los cursos de la lista
+        foreach ($cursos as $curso) {
             $id = $curso->getId();
             $nombre = $curso->getNombre();
-
-            $query->bindParam(':id', $id);
-            $query->bindParam(':nombre', $nombre);
-            $query->execute();
+            $sql = "INSERT INTO curso (id, nombre) VALUES ('$id', '$nombre')";
+            Conexion::ejecutar($sql);
         }
     }
+    
+    
+
+    public function obtenerCursosParaInscripcion() {
+        $cursosParaInscripcion = [];
+        foreach ($this->cursos as $curso) {
+            $cursosParaInscripcion[] = $curso;
+        }
+        return $cursosParaInscripcion;
+    }
+    
 }

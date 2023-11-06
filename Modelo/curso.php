@@ -4,7 +4,7 @@ class Curso {
     private $nombre;
     private $id;
 
-    public function __construct($nombre, $id) {
+    public function __construct($id, $nombre) {
         $this->nombre = $nombre;
         $this->id = $id;
     }

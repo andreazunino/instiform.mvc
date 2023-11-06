@@ -97,7 +97,8 @@ class Vista {
         $opcionesMenuPrincipal = [
             "Configuración de Estudiantes",
             "Configuración de Cursos",
-            "Inscribir"
+            "Inscribir",
+            "Borrar Inscripcion"
         ];
         $this->mostrarMenu($opcionesMenuPrincipal);
     }
