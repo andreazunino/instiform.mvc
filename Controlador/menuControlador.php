@@ -5,19 +5,16 @@ require_once('Modelo/curso.php');
 require_once('Modelo/gestionEstudiante.php');
 require_once('Modelo/gestionCurso.php');
 require_once('./Vista/menuVista.php');
-require_once('./Modelo/inscripcion.php');
 
 class Controlador {
     private $gestionEstudiante;
     private $gestionCurso;
     private $vista;
-    private $inscripcion; 
 
     public function __construct($gestionEstudiante, $gestionCurso, $vista) {
         $this->gestionEstudiante = $gestionEstudiante;
         $this->gestionCurso = $gestionCurso;
         $this->vista = $vista;
-        $this->inscripcion = new inscripcion;
     }
 
 
@@ -42,7 +39,6 @@ class Controlador {
                 break;
             case '3':
                 echo "Seleccionaste Inscribir Estudiante en Curso\n";
-                $this->inscripcion->inscribirEstudianteEnCurso();
                 break;
                 exit;
             default:

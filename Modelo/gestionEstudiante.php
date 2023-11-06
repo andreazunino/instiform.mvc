@@ -38,7 +38,7 @@ class gestionEstudiante {
                 $estudiante['email']
             );
         } else {
-            return null;
+            return $estudiante;
         }
     }
     
