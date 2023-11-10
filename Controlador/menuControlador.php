@@ -120,12 +120,7 @@ class Controlador {
             case '1':
                 echo "Seleccionaste Dar de Alta Cursos\n";
                 $nombreCurso = readline("Ingrese el nombre del curso: ");
-                $codigoCurso = readline("Ingrese el código del curso: ");
-
-                while (!is_numeric($codigoCurso)) {
-                    echo "El código del curso debe ser un número. Inténtelo de nuevo.\n";
-                    $codigoCurso = readline("Ingrese el código del curso: ");
-                }
+                $codigoCurso = null;
                 $curso = new Curso( $codigoCurso, $nombreCurso);
 
                 $this->gestionCurso->agregarCurso($curso);

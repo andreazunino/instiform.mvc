@@ -92,9 +92,7 @@ class gestionCurso extends curso {
     public function eliminarCursoPorID($id) {
         $conexion = Conexion::getConexion();
         try {
-            $inscripcion = new Inscripcion(); // Crear una instancia de la clase Inscripcion si no se ha hecho anteriormente
-            $inscripcion->eliminarInscripcionPorCurso($id); // Eliminar inscripciones relacionadas con el curso
-    
+
             $sql = "DELETE FROM curso WHERE id = '$id'";
             Conexion::ejecutar($sql);
     
@@ -147,18 +145,29 @@ class gestionCurso extends curso {
         $cursos = $this->cursos;
         $conexion = Conexion::getConexion();
     
-        // Eliminar todos los cursos de la base de datos
-        $sql = "DELETE FROM curso";
-        Conexion::ejecutar($sql);
-    
-        // Volver a insertar todos los cursos de la lista
         foreach ($cursos as $curso) {
-            $id = $curso->getId();
             $nombre = $curso->getNombre();
-            $sql = "INSERT INTO curso (id, nombre) VALUES ('$id', '$nombre')";
-            Conexion::ejecutar($sql);
+    
+            // Verificar si el curso ya existe en la base de datos
+            $sqlVerificacion = "SELECT COUNT(*) FROM curso WHERE nombre = :nombre";
+            $stmtVerificacion = $conexion->prepare($sqlVerificacion);
+            $stmtVerificacion->bindParam(':nombre', $nombre, PDO::PARAM_STR);
+            $stmtVerificacion->execute();
+    
+            // Obtener el resultado de la consulta
+            $cantidadCursos = $stmtVerificacion->fetchColumn();
+    
+            // Si el curso no existe, insertarlo en la base de datos
+            if ($cantidadCursos == 0) {
+                $sqlInsercion = "INSERT INTO curso (nombre) VALUES (:nombre)";
+                $stmtInsercion = $conexion->prepare($sqlInsercion);
+                $stmtInsercion->bindParam(':nombre', $nombre, PDO::PARAM_STR);
+                $stmtInsercion->execute();
+            }
         }
+        $this->cargarCursosDesdePostgres();
     }
+    
     
     
 

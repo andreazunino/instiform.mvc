@@ -8,71 +8,83 @@ class Inscripcion {
     public function __construct() {
         $this->cargarInscripcionesDesdePostgres();
     }
+    
     public function cargarInscripciones() {
         $gestionEstudiante = new gestionEstudiante();
         $estudiantes = $gestionEstudiante->obtenerEstudiantesParaInscripcion();
-
+    
         $gestionCurso = new gestionCurso();
         $cursos = $gestionCurso->obtenerCursosParaInscripcion();
-
+    
         echo "Estudiantes Disponibles:\n";
         foreach ($estudiantes as $estudiante) {
             echo "DNI del Estudiante: {$estudiante->getDNI()}, - Nombre del Estudiante: {$estudiante->getNombre()}\n";
         }
-
+    
         $estudianteElegido = readline("Ingrese el DNI del estudiante: ");
         echo "Cursos Disponibles:\n";
         foreach ($cursos as $curso) {
             echo "ID del Curso: {$curso->getId()}, - Nombre del Curso: {$curso->getNombre()}\n";
         }
-
+    
         $cursoElegido = readline("Ingrese el ID del curso: ");
-
-        // Comprueba si el estudiante y el curso existen en los arreglos
+    
+        // Comprobar si el estudiante ya está inscrito en el mismo curso
+        foreach ($this->inscripciones as $inscripcionExistente) {
+            if ($inscripcionExistente['dni_estudiante'] == $estudianteElegido && $inscripcionExistente['id_curso'] == $cursoElegido) {
+                echo "El estudiante ya está inscrito en este curso.\n";
+                return;
+            }
+        }
+    
+        // Comprobar si el estudiante y el curso existen en los arreglos
         $estudianteExiste = false;
         $cursoExiste = false;
-
+    
         foreach ($estudiantes as $estudiante) {
             if ((int)$estudiante->getDNI() === (int)$estudianteElegido) {
                 $estudianteExiste = true;
                 break;
             }
         }
-
+    
         foreach ($cursos as $curso) {
             if ((int)$curso->getId() === (int)$cursoElegido) {
                 $cursoExiste = true;
                 break;
             }
         }
-
+    
         if (!$estudianteExiste) {
             echo "El estudiante con DNI {$estudianteElegido} no se encontró.\n";
             return;
         }
-
+    
         if (!$cursoExiste) {
             echo "El curso con ID {$cursoElegido} no se encontró.\n";
             return;
         }
-
+    
         $inscripcion = [
-            "id" => count($this->inscripciones) + 1,
+            "id" => null,
             "id_curso" => $cursoElegido,
             "dni_estudiante" => $estudianteElegido
         ];
-
+    
         $this->inscripciones[] = $inscripcion;
         echo "Inscripcion exitosa\n";
         $this->guardarInscripciones();
+        $this->inscripciones = [];
+        $this->cargarInscripcionesDesdePostgres();
     }
+    
     
     
     public function cargarInscripcionesDesdePostgres() {
         $conexion = Conexion::getConexion();
         $query = $conexion->query("SELECT * FROM inscripcion");
         $resultados = $query->fetchAll(PDO::FETCH_ASSOC);
-
+       
         foreach ($resultados as $inscripcionData) {
             $inscripcion = [
                 "id" => $inscripcionData['id'],
@@ -81,19 +93,24 @@ class Inscripcion {
             ];
             $this->inscripciones[] = $inscripcion;
         }
+        
     }
 
     public function guardarInscripciones() {
         $inscripciones = $this->inscripciones;
         $conexion = Conexion::getConexion();
+    
         foreach ($inscripciones as $inscripcion) {
-            $id = $inscripcion['id'];
             $idCurso = $inscripcion['id_curso'];
             $dniEstudiante = $inscripcion['dni_estudiante'];
-            $sql = "INSERT INTO inscripcion (id, id_curso, dni_estudiante) VALUES ('$id', '$idCurso', '$dniEstudiante') ON CONFLICT (id) DO NOTHING";
-            Conexion::ejecutar($sql);
+    
+            $sqlInsercion = "INSERT INTO inscripcion (id_curso, dni_estudiante) VALUES ('$idCurso', '$dniEstudiante') ON CONFLICT (id_curso, dni_estudiante) DO NOTHING";
+            Conexion::ejecutar($sqlInsercion);
         }
+    
     }
+    
+
     public function listarInscripciones() {
         if (empty($this->inscripciones)) {
             echo "No hay inscripciones disponibles.\n";
@@ -120,7 +137,6 @@ class Inscripcion {
             }
             if ($indice !== null) {
                 unset($this->inscripciones[$indice]);
-                $this->guardarInscripciones();
                 echo "Inscripción eliminada exitosamente.\n";
             } else {
                 echo "No se encontró ninguna inscripción con el ID especificado.\n";
