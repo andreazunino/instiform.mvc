@@ -142,7 +142,7 @@ class Inscripcion {
                 echo "No se encontró ninguna inscripción con el ID especificado.\n";
             }
         } catch (PDOException $e) {
-            echo 'Error al eliminar inscripción: ' . $e->getMessage();
+            echo 'Error al eliminar inscripción.'();
         }
     }
 

@@ -57,6 +57,10 @@ class Controlador {
                     case '3':
                         $this->inscripcion->listarInscripciones();
                         break;
+                    case '0':
+                        echo "\nSeleccionaste Volver Al Menu Principal\n";
+                        $this->menu($opcionMenu);
+                    
                     default:
                     $this->vista->mostrarMensajeError("Opción no válida. Por favor, selecciona una opción válida.");
                 }
@@ -89,13 +93,14 @@ class Controlador {
 
         case '2':
             echo "Seleccionaste Dar de Baja Estudiante\n";
+            $this->gestionEstudiante->listarEstudiantes();
             echo "Ingrese el DNI del estudiante a eliminar: ";
             $dni = readline();
             $estudianteEliminado = $this->gestionEstudiante->eliminarEstudiantePorDNI($dni);
             if ($estudianteEliminado) {
                 echo "Estudiante con DNI $dni ha sido eliminado correctamente.\n";
             } else {
-                echo "No se encontró ningún estudiante con el DNI $dni o ocurrió un error al eliminar el estudiante.\n";
+                echo "\nNo se pudo eliminar Estudiante con el DNI $dni. \n";
             }
             break;
         case '3':
@@ -114,7 +119,7 @@ class Controlador {
             break;
         case '4':
             $this->gestionEstudiante->listarEstudiantes();
-            $dniVer = readline("Ingrese el DNI del estudiante: ");
+            $dniVer = readline("Ingrese el DNI del estudiante para ampliar su información: ");
             $this->gestionEstudiante->verDatosEInscripcionesPorDNI($dniVer);
             $this->inscripcion->mostrarInscripcionesPorDNI($dniVer);
             break;

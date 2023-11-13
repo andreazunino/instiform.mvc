@@ -3,31 +3,6 @@ require_once('Modelo/inscripcion.php');
 class gestionCurso extends curso {
     private $cursos = [];
 
-    public function eliminarCursoConInscripciones($id) {
-        $conexion = Conexion::getConexion();
-    
-        try {
-            // Eliminar las inscripciones asociadas al curso
-            $sqlInscripciones = "DELETE FROM inscripcion WHERE id_curso = '$id'";
-            Conexion::ejecutar($sqlInscripciones);
-    
-            // Eliminar el curso
-            $sqlCurso = "DELETE FROM curso WHERE id = '$id'";
-            Conexion::ejecutar($sqlCurso);
-    
-            // Eliminar el curso de la lista de cursos
-            foreach ($this->cursos as $key => $curso) {
-                if ((int)$curso->getId() === (int)$id) {
-                    unset($this->cursos[$key]);
-                    $this->guardarCursos();
-                    return true;
-                }
-            }
-            return false;
-        } catch (PDOException $e) {
-            echo 'Error al eliminar curso: ' . $e->getMessage();
-        }
-    }
     
     public function __construct() {
         $this->cargarCursosDesdePostgres();
