@@ -66,7 +66,7 @@ class Controlador {
                 }
                 break;            
             case '0':
-                echo "Que tengas Buen Dia";
+                echo "Que tengas Buen Día";
                 exit;
             default:
                 $this->vista->mostrarMensajeError("Opción no válida. Por favor, selecciona una opción válida.");
@@ -100,7 +100,7 @@ class Controlador {
             if ($estudianteEliminado) {
                 echo "Estudiante con DNI $dni ha sido eliminado correctamente.\n";
             } else {
-                echo "\nNo se pudo eliminar Estudiante con el DNI $dni. \n";
+                echo "\n No se pudo eliminar Estudiante con el DNI $dni. \n";
             }
             break;
         case '3':

@@ -67,21 +67,22 @@ class gestionCurso extends curso {
     public function eliminarCursoPorID($id) {
         $conexion = Conexion::getConexion();
         try {
-
-            $sql = "DELETE FROM curso WHERE id = '$id'";
-            Conexion::ejecutar($sql);
+            if($id != ""){
+                $sql = "DELETE FROM curso WHERE id = '$id'";
+                Conexion::ejecutar($sql);
     
-            foreach ($this->cursos as $key => $curso) {
-                if ((int)$curso->getId() === (int)$id) {
-                    unset($this->cursos[$key]);
-                    $this->guardarCursos();
-                    return true;
+                foreach ($this->cursos as $key => $curso) {
+                    if ((int)$curso->getId() === (int)$id) {
+                        unset($this->cursos[$key]);
+                        $this->guardarCursos();
+                        return true;
+                    }
                 }
+                return false;
             }
-            return false;
-        } catch (PDOException $e) {
-            echo 'Error al eliminar curso: No puedes eliminar un Curso con Estudiantes Inscriptos en él.';
-        }
+            } catch (PDOException $e) {
+                echo 'Error al eliminar curso: No puedes eliminar un Curso con Estudiantes Inscriptos en él.'.PHP_EOL;
+            }
     }
     
     
