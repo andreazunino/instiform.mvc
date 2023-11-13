@@ -15,19 +15,14 @@ if ($db != null) {
 }
 
 
-// Crear instancias del modelo
 $gestionEstudiante = new GestionEstudiante();
 $gestionCurso = new GestionCurso();
 $inscripcion = new Inscripcion();
 
 
-// Crear instancia de la vista
 $vista = new Vista();
 
-// Crear instancia del controlador
 $menu = new Controlador($gestionEstudiante, $gestionCurso, $vista, $inscripcion);
 
-// Ejecutar la aplicación
-//Controlador::run()
- $menu->run();
+$menu->run();
 
