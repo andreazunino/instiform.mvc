@@ -18,8 +18,8 @@ class gestionCurso extends curso {
 
     public function agregarCurso($curso) {
         foreach ($this->cursos as $cursoExistente) {
-            if ($cursoExistente->getId() === $curso->getId()) {
-                echo "El curso con ID {$curso->getId()} ya existe en la lista de cursos.\n";
+            if ($cursoExistente->getNombre() === $curso->getNombre()) {
+                echo "El curso con Nombre: {$curso->getNombre()} ya existe en la lista de cursos.\n";
                 return;
             }
         }  
