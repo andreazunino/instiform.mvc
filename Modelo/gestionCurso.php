@@ -105,7 +105,7 @@ class gestionCurso extends curso {
             }
             return false;
         } catch (PDOException $e) {
-            echo 'Error al eliminar curso: ' . $e->getMessage();
+            echo 'Error al eliminar curso: No puedes eliminar un Curso con Estudiantes Inscriptos en él.';
         }
     }
     

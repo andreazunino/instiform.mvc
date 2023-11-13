@@ -41,15 +41,26 @@ class Controlador {
                 $this->subMenuCursos();
                 break;
             case '3':
-                echo "Seleccionaste Inscribir Estudiante en Curso\n";
-                $this->inscripcion->cargarInscripciones();
-                break;
-            case '4':
-                echo "Seleccionaste Borrar Inscripciones\n";
-                $this->inscripcion->listarInscripciones();
-                $idElim = readline("Ingrese el ID de la inscripcion a eliminar: ");
-                $this->inscripcion->eliminarInscripcionPorID($idElim);
-                break;
+                $this->vista->mostrarSubMenuInscripciones();
+                $opcionMenu = readline("Selecciona una opción: ");
+                switch ($opcionMenu) {
+                    case '1':
+                        echo "Seleccionaste Inscribir Estudiante en Curso\n";
+                        $this->inscripcion->cargarInscripciones();
+                        break;
+                    case '2':
+                        echo "Seleccionaste Borrar Inscripciones\n";
+                        $this->inscripcion->listarInscripciones();
+                        $idElim = readline("Ingrese el ID de la inscripcion a eliminar: ");
+                        $this->inscripcion->eliminarInscripcionPorID($idElim);
+                        break;
+                    case '3':
+                        $this->inscripcion->listarInscripciones();
+                        break;
+                    default:
+                    $this->vista->mostrarMensajeError("Opción no válida. Por favor, selecciona una opción válida.");
+                }
+                break;            
             case '0':
                 echo "Que tengas Buen Dia";
                 exit;
@@ -68,10 +79,10 @@ class Controlador {
         switch ($opcionUser){
          case '1':
             echo "Seleccionaste Dar de Alta Estudiante\n";
-            $nombre = readline("Ingrese nombre del Estudiante");
-            $apellido = readline("Ingrese apellido del Estudiante");
-            $dni = readline("Ingrese dni del Estudiante");
-            $email = readline("Ingrese email del Estudiante");
+            $nombre = readline("Ingrese nombre del Estudiante: ");
+            $apellido = readline("Ingrese apellido del Estudiante: ");
+            $dni = readline("Ingrese dni del Estudiante: ");
+            $email = readline("Ingrese email del Estudiante: ");
             $estudiante = new Estudiante($nombre, $apellido, $dni, $email);
             $this->gestionEstudiante->agregarEstudiante($estudiante);
             break;
@@ -145,7 +156,7 @@ class Controlador {
                             if ($cursoEliminado) {
                                 echo "Curso con ID $idEliminar eliminado correctamente.\n";
                             } else {
-                                echo "No se encontró ningún curso con el ID $idEliminar.\n";
+                                echo "No pudo ser eliminado el Curso con el ID $idEliminar.\n";
                             }
                         }
                         break;
